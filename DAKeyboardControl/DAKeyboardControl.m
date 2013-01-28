@@ -277,6 +277,11 @@ static char UIViewKeyboardPanRecognizer;
     CGRect keyboardEndFrameWindow;
     [[notification.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] getValue: &keyboardEndFrameWindow];
     
+    // Additional Sanity check
+    if (keyboardEndFrameWindow.origin.x == INFINITY || keyboardEndFrameWindow.origin.y == INFINITY) {
+        return;
+    }
+    
     double keyboardTransitionDuration;
     [[notification.userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&keyboardTransitionDuration];
     
