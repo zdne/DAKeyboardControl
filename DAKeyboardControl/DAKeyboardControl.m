@@ -9,6 +9,7 @@
 #import "DAKeyboardControl.h"
 #import <objc/runtime.h>
 
+static NSString * const KVOContext = @"org.zdne.keyboardkvocontext";
 
 static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCurve curve)
 {
@@ -137,7 +138,7 @@ static char UIViewKeyboardPanRecognizer;
     [self addObserver:self
            forKeyPath:@"keyboardActiveView.frame"
               options:0
-              context:NULL];
+              context:(void *)&KVOContext];
 }
 
 - (CGRect)keyboardFrameInView
@@ -193,7 +194,7 @@ static char UIViewKeyboardPanRecognizer;
     
     // Unregister any gesture recognizer
     [self removeGestureRecognizer:self.keyboardPanRecognizer];
-    [self removeObserver:self forKeyPath:@"keyboardActiveView.frame"];
+    [self removeObserver:self forKeyPath:@"keyboardActiveView.frame" context:(void *)&KVOContext];
     
     // Release a few properties
     self.keyboardDidMoveBlock = nil;
@@ -342,7 +343,7 @@ static char UIViewKeyboardPanRecognizer;
                         change:(NSDictionary *)change
                        context:(void *)context
 {
-    if([keyPath isEqualToString:@"keyboardActiveView.frame"] && self.keyboardActiveView)
+    if([keyPath isEqualToString:@"keyboardActiveView.frame"] && self.keyboardActiveView && context == (void *)&KVOContext)
     {
         CGRect keyboardEndFrameWindow = self.keyboardActiveView.frame;
         CGRect keyboardEndFrameView = [self convertRect:keyboardEndFrameWindow fromView:self.keyboardActiveView.window];
