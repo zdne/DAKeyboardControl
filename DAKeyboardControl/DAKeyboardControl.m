@@ -9,7 +9,7 @@
 #import "DAKeyboardControl.h"
 #import <objc/runtime.h>
 
-static NSString * const KVOContext = @"org.zdne.keyboardkvocontext";
+static int KVOContext;
 
 static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCurve curve)
 {
@@ -138,7 +138,7 @@ static char UIViewKeyboardPanRecognizer;
     [self addObserver:self
            forKeyPath:@"keyboardActiveView.frame"
               options:0
-              context:(void *)&KVOContext];
+              context:&KVOContext];
 }
 
 - (CGRect)keyboardFrameInView
@@ -176,7 +176,7 @@ static char UIViewKeyboardPanRecognizer;
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIKeyboardDidShowNotification
                                                   object:nil];
-    
+     
     // For the sake of 4.X compatibility
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:@"UIKeyboardWillChangeFrameNotification"
@@ -194,7 +194,7 @@ static char UIViewKeyboardPanRecognizer;
     
     // Unregister any gesture recognizer
     [self removeGestureRecognizer:self.keyboardPanRecognizer];
-    [self removeObserver:self forKeyPath:@"keyboardActiveView.frame" context:(void *)&KVOContext];
+    [self removeObserver:self forKeyPath:@"keyboardActiveView.frame" context:&KVOContext];
     
     // Release a few properties
     self.keyboardDidMoveBlock = nil;
@@ -343,8 +343,14 @@ static char UIViewKeyboardPanRecognizer;
                         change:(NSDictionary *)change
                        context:(void *)context
 {
-    if([keyPath isEqualToString:@"keyboardActiveView.frame"] && self.keyboardActiveView && context == (void *)&KVOContext)
+    if (context != &KVOContext)
     {
+        // Pass it to super
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+    else if([keyPath isEqualToString:@"keyboardActiveView.frame"] && self.keyboardActiveView)
+    {
+        // Our context, consume this value
         CGRect keyboardEndFrameWindow = self.keyboardActiveView.frame;
         CGRect keyboardEndFrameView = [self convertRect:keyboardEndFrameWindow fromView:self.keyboardActiveView.window];
         if (self.keyboardDidMoveBlock && !self.keyboardActiveView.hidden)
