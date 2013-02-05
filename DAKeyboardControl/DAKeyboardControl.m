@@ -106,6 +106,8 @@ static char UIViewKeyboardPanRecognizer;
                                                  name:UIKeyboardDidShowNotification
                                                object:nil];
     
+    
+#if !defined (__IPHONE_6_0) || __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0
     // For the sake of 4.X compatibility
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(inputKeyboardWillChangeFrame:)
@@ -115,6 +117,7 @@ static char UIViewKeyboardPanRecognizer;
                                              selector:@selector(inputKeyboardDidChangeFrame:)
                                                  name:@"UIKeyboardDidChangeFrameNotification"
                                                object:nil];
+#endif
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(inputKeyboardWillHide:)
@@ -176,7 +179,8 @@ static char UIViewKeyboardPanRecognizer;
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIKeyboardDidShowNotification
                                                   object:nil];
-     
+
+#if !defined (__IPHONE_6_0) || __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0
     // For the sake of 4.X compatibility
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:@"UIKeyboardWillChangeFrameNotification"
@@ -184,6 +188,7 @@ static char UIViewKeyboardPanRecognizer;
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:@"UIKeyboardDidChangeFrameNotification"
                                                   object:nil];
+#endif
     
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIKeyboardWillHideNotification
@@ -273,6 +278,8 @@ static char UIViewKeyboardPanRecognizer;
     }
 }
 
+#if !defined (__IPHONE_6_0) || __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0
+
 - (void)inputKeyboardWillChangeFrame:(NSNotification *)notification
 {
     CGRect keyboardEndFrameWindow;
@@ -306,6 +313,8 @@ static char UIViewKeyboardPanRecognizer;
 {
     // Nothing to see here
 }
+
+#endif
 
 - (void)inputKeyboardWillHide:(NSNotification *)notification
 {
